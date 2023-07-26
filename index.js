@@ -1,3 +1,4 @@
+const fs =require('fs')
 const express = require('express');
 const bodyParser = require('body-parser');
 const jsonWebToken = require('jsonwebtoken')
@@ -38,6 +39,10 @@ const addNewUser = async (projectCollection, userName, password) => {
 }
 
 
+app.get("/",(req,res)=>{
+  res.send("funciona con https")
+})
+
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
   const userName          = req.body.userName;
@@ -77,6 +82,7 @@ const options = {
 const server = https.createServer(options, app);
 
 const port = 3100
+
 server.listen(port, () => {
   console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
 });
