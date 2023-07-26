@@ -50,7 +50,8 @@ const areParametersOk = (projectCollection, userName, password)=>{
     if(projectCollection === "" && userName === "" && password === ""){ 
       console.log("no son vacios")
 
-      if(typeof projectCollection === 'string' && typeof projectCollection === 'string' && typeof projectCollection === 'string'){
+      if(typeof projectCollection === 'string' && typeof userName === 'string' && typeof password === 'string'){
+        console.log(typeof projectCollection, typeof userName, typeof password )
         console.log("son todos string")
             return true
       }
