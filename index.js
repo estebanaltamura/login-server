@@ -42,8 +42,11 @@ const addNewUser = async (projectCollection, userName, password) => {
 }
 
 const areParametersOk = (projectCollection, userName, password)=>{  
-  if(projectCollection !== undefined && userName !== undefined && password !== undefined){      
+  console.log("valores ingresado", projectCollection, userName, password)
+  if(projectCollection !== undefined && userName !== undefined && password !== undefined){ 
+    console.log("no son undefined")
       if(typeof projectCollection === 'string' && typeof projectCollection === 'string' && typeof projectCollection === 'string'){
+        console.log("son todos string")
             return true
       }
       else{
