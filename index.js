@@ -22,7 +22,6 @@ const firestore = new Firestore({
 const isRegisteredUser = async(projectCollection, userName, password)=>{
   const querySnapshot = await firestore.collection(projectCollection).get(); 
   const isRegistered = querySnapshot.docs.some(doc => doc.data().userName === userName && doc.data().password === password);    
-  console.log(isRegistered)  
   return isRegistered
 }
 
@@ -42,23 +41,32 @@ const addNewUser = async (projectCollection, userName, password) => {
   const docRef = await userCollection.add(newUser);  
 }
 
+const areParametersOk = (projectCollection, userName, password)=>{  
+  if(projectCollection !== undefined && userName !== undefined && password !== undefined){      
+      if(typeof projectCollection === 'string' && typeof projectCollection === 'string' && typeof projectCollection === 'string'){
+            return true
+      }
+      else return false
+      }
+  else return false
+}
 
-app.get("/",(req,res)=>{
-  res.send("funciona con https")
-})
 
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
   const userName          = req.body.userName;
   const password          = req.body.password;
+
+  if(areParametersOk(projectCollection, userName, password)){
+    const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password) 
   
-  const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password) 
-  
-  if(isRegisteredUserResult){
-    const token = jsonWebToken.sign({ userName, password }, privateKey); 
-    res.status(200).json({ message: "User logged", "token": token });     
+    if(isRegisteredUserResult){
+      const token = jsonWebToken.sign({ userName, password }, privateKey); 
+      res.status(200).json({ message: "User logged", "token": token });     
+    }
+    else res.status(404).json({ message: "User not found" });
   }
-  else  res.status(404).json({ message: "User not found" });
+  else res.status(400).json({ message: "Bad request" });  
 });
 
 
@@ -67,15 +75,18 @@ app.post('/registerUser', async(req, res) => {
   const userName          = req.body.userName;
   const password          = req.body.password;
   
-  const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName)  
+  if(areParametersOk(projectCollection, userName, password)){
+    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName)  
   
-  if(isUniqueUserNameResult){    
-    await addNewUser(projectCollection, userName, password)
-    res.status(201).json({ message: "User successfully created" });
-  } 
-  else{
-    res.status(409).json({ message: "Username is already taken" });
-  }   
+    if(isUniqueUserNameResult){    
+      await addNewUser(projectCollection, userName, password)
+      res.status(201).json({ message: "User successfully created" });
+    } 
+    else{
+      res.status(409).json({ message: "Username is already taken" });
+    }   
+  }
+  else res.status(400).json({ message: "Bad request" });
 });
 
 const options = {
