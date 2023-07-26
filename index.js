@@ -47,7 +47,7 @@ const areParametersOk = (projectCollection, userName, password)=>{
   if(projectCollection !== undefined && userName !== undefined && password !== undefined){ 
     console.log("no son undefined")
 
-    if(projectCollection === "" && userName === "" && password === ""){ 
+    if(projectCollection !== "" && userName !== "" && password !== ""){ 
       console.log("no son vacios")
 
       if(typeof projectCollection === 'string' && typeof userName === 'string' && typeof password === 'string'){
