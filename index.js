@@ -18,6 +18,7 @@ const firestore = new Firestore({
 
 
 const isRegisteredUser = async(projectCollection, userName, password)=>{
+  console.log(projectCollection, userName, password)
   const querySnapshot = await firestore.collection(projectCollection).get(); 
   const isRegistered = querySnapshot.docs.some(doc => doc.data().userName === userName && doc.data().password === password);       
   return isRegistered
