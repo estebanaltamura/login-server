@@ -1,11 +1,13 @@
 const fs            =require('fs')
 const https         = require('https')
 const express       = require('express');
+const cors          = require('cors')
 const bodyParser    = require('body-parser');
 const jsonWebToken  = require('jsonwebtoken')
 const {Firestore}   = require('@google-cloud/firestore');
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 const privateKey = "strongPassword" 
