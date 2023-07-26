@@ -46,9 +46,15 @@ const areParametersOk = (projectCollection, userName, password)=>{
       if(typeof projectCollection === 'string' && typeof projectCollection === 'string' && typeof projectCollection === 'string'){
             return true
       }
-      else return false
+      else{
+        console.log("no es undefined pero no son string")
+        return false
+      } 
       }
-  else return false
+  else{
+    console.log("alguno es undefined")
+    return false
+  } 
 }
 
 
