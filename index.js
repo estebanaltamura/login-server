@@ -69,7 +69,15 @@ app.post('/registerUser', async(req, res) => {
   }   
 });
 
+const options = {
+  key: fs.readFileSync('/etc/cert/privkey.pem'),
+  cert: fs.readFileSync('/etc/cert/cert.pem')
+};
+
+const server = https.createServer(options, app);
+
 const port = 3100
-app.listen(port, () => {
-  console.log(`Servidor HTTP en Express escuchando en el puerto ${port}`);
+server.listen(port, () => {
+  console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
 });
+
