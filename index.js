@@ -43,17 +43,27 @@ const addNewUser = async (projectCollection, userName, password) => {
 
 const areParametersOk = (projectCollection, userName, password)=>{  
   console.log("valores ingresado", projectCollection, userName, password)
+
   if(projectCollection !== undefined && userName !== undefined && password !== undefined){ 
     console.log("no son undefined")
+
+    if(projectCollection === "" && userName === "" && password === ""){ 
+      console.log("no son vacios")
+
       if(typeof projectCollection === 'string' && typeof projectCollection === 'string' && typeof projectCollection === 'string'){
         console.log("son todos string")
             return true
       }
       else{
-        console.log("no es undefined pero no son string")
+        console.log("no son undefined, no son vacios, pero no son string")
         return false
       } 
-      }
+    }
+    else {
+      console.log("no son undefined, pero son valores vacios")
+      return false
+    }  
+  }
   else{
     console.log("alguno es undefined")
     return false
