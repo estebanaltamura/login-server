@@ -14,7 +14,7 @@ const privateKey = "strongPassword"
 
 const firestore = new Firestore({
   projectId: 'login-7e24a',
-  keyFilename: './login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
+  keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
 
