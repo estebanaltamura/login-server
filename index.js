@@ -66,6 +66,8 @@ app.post('/login', async(req, res) => {
   const userName          = req.body.userName;
   const password          = req.body.password;
 
+  console.log(projectCollection, userName, password)
+
   if(areParametersOk(projectCollection, userName, password)){
     const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password) 
   
