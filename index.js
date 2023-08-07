@@ -17,8 +17,6 @@ const firestore = new Firestore({
   keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
-
-
 const isRegisteredUser = async(projectCollection, userName, password)=>{
   const querySnapshot = await firestore.collection(projectCollection).get(); 
   const isRegistered = querySnapshot.docs.some(doc => doc.data().userName === userName && doc.data().password === password);    
@@ -38,28 +36,8 @@ const addNewUser = async (projectCollection, userName, password) => {
     userName: userName,
     password: password
   }
-  const docRef = await userCollection.add(newUser);  
+  await userCollection.add(newUser);  
 }
-
-const areParametersOk = (projectCollection, userName, password)=>{  
-  if(projectCollection !== undefined && userName !== undefined && password !== undefined){ 
-    if(projectCollection !== "" && userName !== "" && password !== ""){ 
-      if(typeof projectCollection === 'string' && typeof userName === 'string' && typeof password === 'string'){        
-            return true
-      }
-      else{        
-        return false
-      } 
-    }
-    else {      
-      return false
-    }  
-  }
-  else{    
-    return false
-  } 
-}
-
 
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
@@ -68,16 +46,24 @@ app.post('/login', async(req, res) => {
 
   console.log(projectCollection, userName, password)
 
-  if(areParametersOk(projectCollection, userName, password)){
-    const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password) 
+  if( typeof projectCollection === 'string' && 
+      projectCollection !== undefined && 
+      projectCollection !== "" &&   
+      typeof userName === 'string' && 
+      userName !== undefined && 
+      userName !== "" &&   
+      typeof password === 'string' &&
+      password !== undefined  && 
+      password !== ""){
+        const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password)
+        if(isRegisteredUserResult){
+          const token = jsonWebToken.sign({ userName, password }, privateKey); 
+          res.status(200).json({ message: "User logged", "token": token });     
+        }
+        else res.status(404).json({ message: "Wrong username or password"});
+      }
+  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
   
-    if(isRegisteredUserResult){
-      const token = jsonWebToken.sign({ userName, password }, privateKey); 
-      res.status(200).json({ message: "User logged", "token": token });     
-    }
-    else res.status(404).json({ message: "User not found" });
-  }
-  else res.status(400).json({ message: "Bad request" });  
 });
 
 
@@ -85,10 +71,17 @@ app.post('/registerUser', async(req, res) => {
   const projectCollection = req.body.projectCollection 
   const userName          = req.body.userName;
   const password          = req.body.password;
-  
-  if(areParametersOk(projectCollection, userName, password)){
-    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName)  
-  
+
+  if( typeof projectCollection === 'string' && 
+  projectCollection !== undefined && 
+  projectCollection !== "" &&   
+  typeof userName === 'string' && 
+  userName !== undefined && 
+  userName !== "" &&   
+  typeof password === 'string' &&
+  password !== undefined  && 
+  password !== ""){
+    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName)
     if(isUniqueUserNameResult){    
       await addNewUser(projectCollection, userName, password)
       res.status(201).json({ message: "User successfully created" });
@@ -97,8 +90,8 @@ app.post('/registerUser', async(req, res) => {
       res.status(409).json({ message: "Username is already taken" });
     }   
   }
-  else res.status(400).json({ message: "Bad request" });
-});
+  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
+})   
 
 const options = {
   key: fs.readFileSync('/etc/cert/privkey.pem'),
@@ -106,7 +99,6 @@ const options = {
 };
 
 const server = https.createServer(options, app);
-
 const port = 3100
 
 server.listen(port, () => {
