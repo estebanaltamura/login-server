@@ -39,6 +39,18 @@ const addNewUser = async (projectCollection, userName, password) => {
   await userCollection.add(newUser);  
 }
 
+const getUserNameFromToken = (token) =>{
+  try {
+    const decodedToken = jsonWebToken.verify(token, privateKey);
+    return decodedToken.userName;
+  } catch (error) {    
+    console.error("Error al verificar el token:", error.message);
+    return false;
+  }
+}
+
+
+
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
   const userName          = req.body.userName;
@@ -93,13 +105,41 @@ app.post('/registerUser', async(req, res) => {
   else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
 })   
 
-const options = {
-  key: fs.readFileSync('/etc/cert/privkey.pem'),
-  cert: fs.readFileSync('/etc/cert/cert.pem')
-};
+app.post('/registerUser', async(req, res) => {
+  const contentType             = req.body.contentType;
+  const contentId               = req.body.contentId;
+  const token                   = req.body.token;
+  const projectCollection       = req.body.projectCollection 
 
-const server = https.createServer(options, app);
+  const querySnapshot = await firestore.collection(projectCollection).get();
+
+  console.log(querySnapshot)
+})
+
+
+//recibo . busco y escribo o busco y elimino
+// setContentLiked(contentType, contentId, token, projectCollection){
+  
+  // const docRef = getUserNameFromToken(token)
+  // const docRef = 
+
+  // return //objeto con dos arrays
+// }
+//la respuesta de ese post se refleja en una actualizacion del estado de los arrays de contenidos likeados
+
+// const options = {
+//   key: fs.readFileSync('/etc/cert/privkey.pem'),
+//   cert: fs.readFileSync('/etc/cert/cert.pem')
+// };
+
+// const server = https.createServer(options, app);
+// const port = 3100
+
+
+const server = https.createServer(app);
 const port = 3100
+
+
 
 server.listen(port, () => {
   console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
