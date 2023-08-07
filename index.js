@@ -132,12 +132,11 @@ app.post('/registerUser', async(req, res) => {
 //   cert: fs.readFileSync('/etc/cert/cert.pem')
 // };
 
-// const server = https.createServer(options, app);
-// const port = 3100
-
-
-const server = https.createServer(app);
+const server = https.createServer(options, app);
 const port = 3100
+
+
+
 
 
 
