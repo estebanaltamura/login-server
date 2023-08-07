@@ -105,7 +105,7 @@ app.post('/registerUser', async(req, res) => {
   else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
 })   
 
-app.post('/registerUser', async(req, res) => {
+app.post('/like', async(req, res) => {
   const contentType             = req.body.contentType;
   const contentId               = req.body.contentId;
   const token                   = req.body.token;
