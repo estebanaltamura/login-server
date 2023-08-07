@@ -127,10 +127,10 @@ app.post('/registerUser', async(req, res) => {
 // }
 //la respuesta de ese post se refleja en una actualizacion del estado de los arrays de contenidos likeados
 
-// const options = {
-//   key: fs.readFileSync('/etc/cert/privkey.pem'),
-//   cert: fs.readFileSync('/etc/cert/cert.pem')
-// };
+const options = {
+  key: fs.readFileSync('/etc/cert/privkey.pem'),
+  cert: fs.readFileSync('/etc/cert/cert.pem')
+};
 
 const server = https.createServer(options, app);
 const port = 3100
