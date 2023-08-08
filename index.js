@@ -76,8 +76,8 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   
   
 
-  (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
-  (contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)) && contentLikedValue['tvSeries'].push(contentId)    
+  (contentType === 'movie') && contentLikedValue['movies'].push(contentId)
+  (contentType === 'tv') && contentLikedValue['tvSeries'].push(contentId)    
 
   try {
       await docRef.update({ ['contentLiked']:  contentLikedValue});  
