@@ -72,7 +72,7 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   const docRef = firestore.collection(projectCollection).doc(docId);     
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
-  const contentLikedValue = docSnapshotData.contentLiked
+  const contentLikedValue = docSnapshotData['contentLiked']
   
   
 
