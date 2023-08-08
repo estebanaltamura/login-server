@@ -158,14 +158,14 @@ app.post('/getContentLikedData', async(req, res) => {
 app.post('/setContentLikedData', async(req, res) => {  
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
-  const updatedData             = eq.body.updatedData 
+  const updatedData             = req.body.updatedData 
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
   
   const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
 
-  res.status(200).json({ "setcontentLiked": successful}); 
+  res.status(200).json({ "setcontentLiked": contentLikedData}); 
 })
 
 
