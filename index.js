@@ -72,7 +72,7 @@ const addContentLike = async (projectCollection, docId, isFirstContentLiked, con
 
   
   
-  if(isFirstContentLiked === false){
+  if(isFirstContentLiked === true){
 
     const contentyLikedValue = contentType === movie ? {'movies': [contentId], 'tv-series': []} : {'movies': [], 'tv-series': [contentId]}
 
