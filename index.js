@@ -87,7 +87,7 @@ const addContentLike = async (projectCollection, docId, isFirstContentLiked, con
     const contentLikedValue = docSnapshot.data().contentLiked
 
     contentType === 'movie' && contentLikedValue.movies.push(contentId)
-    contentType === 'tv-series' && contentLikedValue.movies.push(contentId)    
+    contentType === 'tv' && contentLikedValue.tv-series.push(contentId)    
 
     try {
       await docRef.update({ ['contentLiked']:  contentLikedValue});  
