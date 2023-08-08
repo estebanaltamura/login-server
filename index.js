@@ -39,7 +39,7 @@ const addNewUser = async (projectCollection, userName, password) => {
   const newUser = {
     userName: userName,
     password: password,
-    contentLiked: {'movies': [], 'tv-series': []}
+    contentLiked: {'movies': [], 'tvSeries': []}
   }
   await userCollection.add(newUser);  
 }
@@ -77,7 +77,7 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   
 
   (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
-  (contentType === 'tv' && !contentLikedValue['tv-series'].includes(contentId)) && contentLikedValue['tv-series'].push(contentId)    
+  (contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)) && contentLikedValue['tvSeries'].push(contentId)    
 
   try {
       await docRef.update({ ['contentLiked']:  contentLikedValue});  
