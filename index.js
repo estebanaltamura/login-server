@@ -38,7 +38,8 @@ const addNewUser = async (projectCollection, userName, password) => {
 
   const newUser = {
     userName: userName,
-    password: password
+    password: password,
+    contentLiked: {'movies': [], 'tv-series': []}
   }
   await userCollection.add(newUser);  
 }
@@ -67,51 +68,25 @@ const getDocIdFromUserNameAndPassword = async (projectCollection, userName, pass
   }  
 }
 
-const addContentLike = async (projectCollection, docId, isFirstContentLiked, contentType, contentId)=>{
-  const docRef = firestore.collection(projectCollection).doc(docId);  
-  
-  if(isFirstContentLiked === true){
-    const contentyLikedValue = contentType === 'movie' ? {'movies': [contentId], 'tv-series': []} : {'movies': [], 'tv-series': [contentId]}
+const addContentLike = async (projectCollection, docId, contentType, contentId)=>{
+  const docRef = firestore.collection(projectCollection).doc(docId);     
+  const docSnapshot = await docRef.get();    
+  const contentLikedValue = docSnapshot.data().contentLiked
 
-    try {
-      await docRef.update({ ['contentLiked']:  contentyLikedValue});  
-      console.log('doc updated')  
-    } 
-    catch (error) {
-      console.error("Error updating document: ", error);
-    }
-  } 
+  contentType === 'movie' && contentLikedValue.movies.push(contentId)
+  contentType === 'tv' && contentLikedValue.tv-series.push(contentId)    
 
-  else{
-    const docSnapshot = await docRef.get();
-    const contentLikedValue = docSnapshot.data().contentLiked
-
-    contentType === 'movie' && contentLikedValue.movies.push(contentId)
-    contentType === 'tv' && contentLikedValue.tv-series.push(contentId)    
-
-    try {
+  try {
       await docRef.update({ ['contentLiked']:  contentLikedValue});  
       console.log('doc updated')  
-    } 
-    catch (error) {
+  } 
+  catch (error) {
       console.error("Error updating document: ", error);
-    }
-  }  
-}
-
-
-const hasContentLiked = async (projectCollection, docId) => {
-  const docRef = firestore.collection(projectCollection).doc(docId);
-  
-  const docSnapshot = await docRef.get();
-
-  if (docSnapshot.exists) {
-    return docSnapshot.data().contentLiked !== undefined ? true : false; 
-  } else {
-    console.log("Document does not exist");
-    return null;
   }
-}
+}  
+
+
+
 
 
 
@@ -178,10 +153,10 @@ app.post('/like', async(req, res) => {
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
 
-  const hasContentLikedResult = await hasContentLiked(projectCollection, docId)
+
 
   
-  await addContentLike(projectCollection, docId, !hasContentLikedResult, contentType, contentId)
+  await addContentLike(projectCollection, docId, contentType, contentId)
   
 
 
