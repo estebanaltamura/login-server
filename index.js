@@ -74,7 +74,7 @@ const addContentLike = async (projectCollection, docId, isFirstContentLiked, con
   
   if(isFirstContentLiked === true){
 
-    const contentyLikedValue = contentType === movie ? {'movies': [contentId], 'tv-series': []} : {'movies': [], 'tv-series': [contentId]}
+    const contentyLikedValue = contentType === 'movie' ? {'movies': [contentId], 'tv-series': []} : {'movies': [], 'tv-series': [contentId]}
 
     try {
       await docRef.update({ ['contentLiked']:  contentyLikedValue});  
