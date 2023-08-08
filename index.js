@@ -170,10 +170,6 @@ app.post('/setContentLikedData', async(req, res) => {
 
 
 
-
-projectCollection, docId, updatedData
-
-
 const options = {
   key: fs.readFileSync('/etc/cert/privkey.pem'),
   cert: fs.readFileSync('/etc/cert/cert.pem')
