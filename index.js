@@ -152,7 +152,7 @@ app.post('/getContentLikedData', async(req, res) => {
   
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
-  res.status(200).json({ "message": contentLikedData }); 
+  res.status(200).json({ "contentLiked": contentLikedData }); 
 })
 
 app.post('/setContentLikedData', async(req, res) => {  
