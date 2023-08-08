@@ -114,8 +114,10 @@ app.post('/like', async(req, res) => {
   const querySnapshot = await firestore.collection(projectCollection).get();
   res.status(200).json({ message: "Like" });
 
+
+  //encuentre
   querySnapshot.docs.forEach((doc)=>{
-    console.log(doc.data())
+    console.log(doc)
   })
   
 })
