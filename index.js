@@ -72,12 +72,17 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   const docRef = firestore.collection(projectCollection).doc(docId);     
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
-  const contentLikedValue = docSnapshotData['contentLiked']
+  const contentLikedValue = docSnapshotData.contentLiked
   
   
 
-  (contentType === 'movie') && contentLikedValue['movies'].push(contentId)
-  (contentType === 'tv') && contentLikedValue['tvSeries'].push(contentId)    
+  if(contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)){
+    contentLikedValue['movies'].push(contentId)
+  }
+
+  if(contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)){
+    contentLikedValue['tvSeries'].push(contentId)    
+  }
 
   try {
       await docRef.update({ ['contentLiked']:  contentLikedValue});  
