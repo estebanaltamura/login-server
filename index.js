@@ -71,7 +71,9 @@ const getDocIdFromUserNameAndPassword = async (projectCollection, userName, pass
 const addContentLike = async (projectCollection, docId, contentType, contentId)=>{
   const docRef = firestore.collection(projectCollection).doc(docId);     
   const docSnapshot = await docRef.get();    
-  const contentLikedValue = docSnapshot.data().contentLiked
+  const docSnapshotData = docSnapshot.data()
+  const contentLikedValue = docSnapshotData['contentLiked']
+  
 
   (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
   (contentType === 'tv' && !contentLikedValue['tv'].includes(contentId)) && contentLikedValue['tv-series'].push(contentId)    
