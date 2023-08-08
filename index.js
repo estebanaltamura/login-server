@@ -17,16 +17,20 @@ const firestore = new Firestore({
   keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
-const isRegisteredUser = async(projectCollection, userName, password)=>{
-  const querySnapshot = await firestore.collection(projectCollection).get(); 
-  const isRegistered = querySnapshot.docs.some(doc => doc.data().userName === userName && doc.data().password === password);    
-  return isRegistered
+const isRegisteredUser = async(projectCollection, userName, password) => {
+  const usersRef = firestore.collection(projectCollection);  
+  const query = usersRef.where('userName', '==', userName).where('password', '==', password);
+  
+  const querySnapshot = await query.get();
+  return !querySnapshot.empty;
 }
 
-const isUniqueUserName = async(projectCollection, userName)=>{
-  const querySnapshot = await firestore.collection(projectCollection).get(); 
-  const isUniqueUserName = querySnapshot.docs.some(doc => doc.data().userName === userName);       
-  return !isUniqueUserName
+const isUniqueUserName = async(projectCollection, userName) => {
+  const usersRef = firestore.collection(projectCollection);
+  const query = usersRef.where('userName', '==', userName);
+  
+  const querySnapshot = await query.get();
+  return querySnapshot.empty; 
 }
 
 const addNewUser = async (projectCollection, userName, password) => {
@@ -39,13 +43,40 @@ const addNewUser = async (projectCollection, userName, password) => {
   await userCollection.add(newUser);  
 }
 
-const getUserNameFromToken = (token) =>{
+const getUserNameAndPasswordFromToken = (token) =>{
   try {
     const decodedToken = jsonWebToken.verify(token, privateKey);
-    return decodedToken.userName;
+    return { userName: decodedToken.userName, password: decodedToken.password };
   } catch (error) {    
     console.error("Error al verificar el token:", error.message);
     return false;
+  }
+}
+
+const getDocIdFromUserNameAndPassword = async (projectCollection, userName, password)=>{
+ 
+  const usersRef = firestore.collection(projectCollection);  
+  const query = usersRef.where('userName', '==', userName).where('password', '==', password);
+    
+  const querySnapshot = await query.get();
+  
+  if (querySnapshot.empty) {
+    return null; 
+  } else {      
+    return querySnapshot.docs[0].id;
+  }  
+}
+
+const addContentLike = async (projectCollection, docId, newContentLikedObject)=>{
+  const docRef = firestore.collection(projectCollection).doc(docId);
+
+  
+  try {
+    await docRef.update({['contentLiked']: newContentLikedObject});  
+    console.log('doc updated')  
+  } 
+  catch (error) {
+    console.error("Error updating document: ", error);
   }
 }
 
@@ -111,14 +142,18 @@ app.post('/like', async(req, res) => {
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
 
-  const querySnapshot = await firestore.collection(projectCollection).get();
-  res.status(200).json({ message: "Like" });
+
+  const { userName, password } = getUserNameAndPasswordFromToken(token)
 
 
-  //encuentre
-  querySnapshot.docs.forEach((doc)=>{
-    console.log(doc)
-  })
+  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
+
+  const objeto = {"objeto": "objeto"}
+
+  await addContentLike(projectCollection, docId, objeto)
+
+
+  
   
 })
 
