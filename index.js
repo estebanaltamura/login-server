@@ -45,8 +45,6 @@ const addNewUser = async (projectCollection, userName, password) => {
 }
 
 
-
-
 const getUserNameAndPasswordFromToken = (token) =>{
   try {
     const decodedToken = jsonWebToken.verify(token, privateKey);
@@ -59,8 +57,7 @@ const getUserNameAndPasswordFromToken = (token) =>{
 
 const getDocIdFromUserNameAndPassword = async (projectCollection, userName, password)=>{ 
   const usersRef = firestore.collection(projectCollection);  
-  const query = usersRef.where('userName', '==', userName).where('password', '==', password);
-    
+  const query = usersRef.where('userName', '==', userName).where('password', '==', password);    
   const querySnapshot = await query.get();
   
   if (querySnapshot.empty) {
@@ -75,39 +72,20 @@ const getContentLikedData = async (projectCollection, docId)=>{
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
   const contentLikedValue = docSnapshotData.contentLiked
-  return contentLikedValue
- 
+  return contentLikedValue 
 }
 
+const setContentLikedData = async (projectCollection, docId, updatedData)=>{  
+  try{
+  const docRef = firestore.collection(projectCollection).doc(docId);     
+  await docRef.update(updatedData);
+    console.log('Documento actualizado exitosamente');
+  } 
 
-
-// const addContentLike = async (projectCollection, docId, contentType, contentId)=>{
-//   const docRef = firestore.collection(projectCollection).doc(docId);     
-//   const docSnapshot = await docRef.get();    
-//   const docSnapshotData = docSnapshot.data()
-//   const contentLikedValue = docSnapshotData.contentLiked
-  
-  
-
-//   if(contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)){
-//     contentLikedValue['movies'].push(contentId)
-//   }
-
-//   if(contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)){
-//     contentLikedValue['tvSeries'].push(contentId)    
-//   }
-
-//   try {
-//       await docRef.update({ ['contentLiked']:  contentLikedValue});  
-//       console.log('doc updated')  
-//   } 
-//   catch (error) {
-//       console.error("Error updating document: ", error);
-//   }
-// }  
-
-
-
+  catch (error) {
+    console.error('Error al actualizar el documento:', error);
+  }
+}
 
 
 
@@ -174,19 +152,27 @@ app.post('/getContentLikedData', async(req, res) => {
   
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
-  res.status(200).json({ "contentLiked": contentLikedData }); 
+  res.status(200); 
+})
+
+app.post('/setContentLikedData', async(req, res) => {  
+  const token                   = req.body.token;
+  const projectCollection       = req.body.projectCollection 
+  const updatedData             = eq.body.updatedData 
+
+  const { userName, password } = getUserNameAndPasswordFromToken(token)
+  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
+  
+  const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
+
+  res.status(200); 
 })
 
 
-//recibo . busco y escribo o busco y elimino
-// setContentLiked(contentType, contentId, token, projectCollection){
-  
-  // const docRef = getUserNameFromToken(token)
-  // const docRef = 
 
-  // return //objeto con dos arrays
-// }
-//la respuesta de ese post se refleja en una actualizacion del estado de los arrays de contenidos likeados
+
+projectCollection, docId, updatedData
+
 
 const options = {
   key: fs.readFileSync('/etc/cert/privkey.pem'),
@@ -195,10 +181,6 @@ const options = {
 
 const server = https.createServer(options, app);
 const port = 3100
-
-
-
-
 
 
 server.listen(port, () => {
