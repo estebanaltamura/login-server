@@ -161,7 +161,7 @@ app.post('/like', async(req, res) => {
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
 
-  const hasContentLikedResult = await hasContentLiked()
+  const hasContentLikedResult = await hasContentLiked(projectCollection, docId)
 
   if (hasContentLikedResult === false){
     await addContentLike(projectCollection, docId, objeto)
