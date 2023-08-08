@@ -44,6 +44,9 @@ const addNewUser = async (projectCollection, userName, password) => {
   await userCollection.add(newUser);  
 }
 
+
+
+
 const getUserNameAndPasswordFromToken = (token) =>{
   try {
     const decodedToken = jsonWebToken.verify(token, privateKey);
@@ -54,8 +57,7 @@ const getUserNameAndPasswordFromToken = (token) =>{
   }
 }
 
-const getDocIdFromUserNameAndPassword = async (projectCollection, userName, password)=>{
- 
+const getDocIdFromUserNameAndPassword = async (projectCollection, userName, password)=>{ 
   const usersRef = firestore.collection(projectCollection);  
   const query = usersRef.where('userName', '==', userName).where('password', '==', password);
     
@@ -68,30 +70,41 @@ const getDocIdFromUserNameAndPassword = async (projectCollection, userName, pass
   }  
 }
 
-const addContentLike = async (projectCollection, docId, contentType, contentId)=>{
+const getContentLikedData = async (projectCollection, docId)=>{
   const docRef = firestore.collection(projectCollection).doc(docId);     
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
   const contentLikedValue = docSnapshotData.contentLiked
+  return contentLikedValue
+ 
+}
+
+
+
+// const addContentLike = async (projectCollection, docId, contentType, contentId)=>{
+//   const docRef = firestore.collection(projectCollection).doc(docId);     
+//   const docSnapshot = await docRef.get();    
+//   const docSnapshotData = docSnapshot.data()
+//   const contentLikedValue = docSnapshotData.contentLiked
   
   
 
-  if(contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)){
-    contentLikedValue['movies'].push(contentId)
-  }
+//   if(contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)){
+//     contentLikedValue['movies'].push(contentId)
+//   }
 
-  if(contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)){
-    contentLikedValue['tvSeries'].push(contentId)    
-  }
+//   if(contentType === 'tv' && !contentLikedValue['tvSeries'].includes(contentId)){
+//     contentLikedValue['tvSeries'].push(contentId)    
+//   }
 
-  try {
-      await docRef.update({ ['contentLiked']:  contentLikedValue});  
-      console.log('doc updated')  
-  } 
-  catch (error) {
-      console.error("Error updating document: ", error);
-  }
-}  
+//   try {
+//       await docRef.update({ ['contentLiked']:  contentLikedValue});  
+//       console.log('doc updated')  
+//   } 
+//   catch (error) {
+//       console.error("Error updating document: ", error);
+//   }
+// }  
 
 
 
@@ -152,29 +165,16 @@ app.post('/registerUser', async(req, res) => {
   else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
 })   
 
-app.post('/like', async(req, res) => {
-  const contentType             = req.body.contentType;
-  const contentId               = req.body.contentId;
+app.post('/getContentLikedData', async(req, res) => {  
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
-
-
-
   
-  await addContentLike(projectCollection, docId, contentType, contentId)
-  
+  const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
-
-  
-
-  
-
-
-  
-  
+  res.status(200).json({ "contentLiked": contentLikedData }); 
 })
 
 
