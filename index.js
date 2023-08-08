@@ -152,7 +152,7 @@ app.post('/getContentLikedData', async(req, res) => {
   
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
-  res.status(200); 
+  res.status(200).json({ "contentLiked": contentLikedData }); 
 })
 
 app.post('/setContentLikedData', async(req, res) => {  
@@ -165,8 +165,12 @@ app.post('/setContentLikedData', async(req, res) => {
   
   const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
 
-  res.status(200); 
+  res.status(200).json({ "setcontentLiked": successful}); 
 })
+
+
+
+
 
 
 
