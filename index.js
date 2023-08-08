@@ -67,16 +67,25 @@ const getDocIdFromUserNameAndPassword = async (projectCollection, userName, pass
   }  
 }
 
-const addContentLike = async (projectCollection, docId, newContentLikedObject)=>{
+const addContentLike = async (projectCollection, docId, isFirstContentLiked, contentType, contentId)=>{
   const docRef = firestore.collection(projectCollection).doc(docId);
+
   
-  try {
-    await docRef.update({['contentLiked']: newContentLikedObject});  
-    console.log('doc updated')  
+  
+  if(isFirstContentLiked === false){
+
+    const contentyLikedValue = contentType === movie ? {'movies': [contentId], 'tv-series': []} : {'movies': [], 'tv-series': [contentId]}
+
+    try {
+      await docRef.update({ ['contentLiked']:  contentyLikedValue});  
+      console.log('doc updated')  
+    } 
+    catch (error) {
+      console.error("Error updating document: ", error);
+    }
+
   } 
-  catch (error) {
-    console.error("Error updating document: ", error);
-  }
+  
 }
 
 
@@ -155,7 +164,7 @@ app.post('/like', async(req, res) => {
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
 
-  const objeto = {"objeto": "objeto"}
+  
 
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
@@ -164,8 +173,9 @@ app.post('/like', async(req, res) => {
   const hasContentLikedResult = await hasContentLiked(projectCollection, docId)
 
   if (hasContentLikedResult === false){
-    await addContentLike(projectCollection, docId, objeto)
+    await addContentLike(projectCollection, docId, true, contentType, contentId)
   }
+
 
   
 
