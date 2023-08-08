@@ -74,7 +74,7 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   const docSnapshotData = docSnapshot.data()
   const contentLikedValue = docSnapshotData.contentLiked
   
-  console.log(contentLikedValue)
+  
 
   (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
   (contentType === 'tv' && !contentLikedValue['tv-series'].includes(contentId)) && contentLikedValue['tv-series'].push(contentId)    
