@@ -69,7 +69,6 @@ const getDocIdFromUserNameAndPassword = async (projectCollection, userName, pass
 
 const addContentLike = async (projectCollection, docId, newContentLikedObject)=>{
   const docRef = firestore.collection(projectCollection).doc(docId);
-
   
   try {
     await docRef.update({['contentLiked']: newContentLikedObject});  
@@ -77,6 +76,20 @@ const addContentLike = async (projectCollection, docId, newContentLikedObject)=>
   } 
   catch (error) {
     console.error("Error updating document: ", error);
+  }
+}
+
+
+const hasContentLiked = async (projectCollection, docId) => {
+  const docRef = firestore.collection(projectCollection).doc(docId);
+  
+  const docSnapshot = await docRef.get();
+
+  if (docSnapshot.exists) {
+    return docSnapshot.data().contentLiked !== undefined ? true : false; 
+  } else {
+    console.log("Document does not exist");
+    return null;
   }
 }
 
@@ -142,15 +155,21 @@ app.post('/like', async(req, res) => {
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
 
-
-  const { userName, password } = getUserNameAndPasswordFromToken(token)
-
-
-  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
-
   const objeto = {"objeto": "objeto"}
 
-  await addContentLike(projectCollection, docId, objeto)
+
+  const { userName, password } = getUserNameAndPasswordFromToken(token)
+  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
+
+  const hasContentLikedResult = await hasContentLiked()
+
+  if (hasContentLikedResult === false){
+    await addContentLike(projectCollection, docId, objeto)
+  }
+
+  
+
+  
 
 
   
