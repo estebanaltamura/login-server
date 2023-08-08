@@ -74,17 +74,18 @@ const addContentLike = async (projectCollection, docId, contentType, contentId)=
   const docSnapshotData = docSnapshot.data()
   const contentLikedValue = docSnapshotData.contentLiked
   
+  console.log(contentLikedValue)
 
-  (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
-  (contentType === 'tv' && !contentLikedValue['tv'].includes(contentId)) && contentLikedValue['tv-series'].push(contentId)    
+  // (contentType === 'movie' && !contentLikedValue['movies'].includes(contentId)) && contentLikedValue['movies'].push(contentId)
+  // (contentType === 'tv' && !contentLikedValue['tv'].includes(contentId)) && contentLikedValue['tv-series'].push(contentId)    
 
-  try {
-      await docRef.update({ ['contentLiked']:  contentLikedValue});  
-      console.log('doc updated')  
-  } 
-  catch (error) {
-      console.error("Error updating document: ", error);
-  }
+  // try {
+  //     await docRef.update({ ['contentLiked']:  contentLikedValue});  
+  //     console.log('doc updated')  
+  // } 
+  // catch (error) {
+  //     console.error("Error updating document: ", error);
+  // }
 }  
 
 
