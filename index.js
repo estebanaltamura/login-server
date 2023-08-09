@@ -39,7 +39,7 @@ const addNewUser = async (projectCollection, userName, password) => {
   const newUser = {
     userName: userName,
     password: password,
-    contentLiked: {'movies': [], 'tvSeries': []}
+    contentLiked: {'movies': [], 'tvSeries': [], 'allFavorites': []}
   }
   await userCollection.add(newUser);  
 }
