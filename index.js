@@ -150,7 +150,7 @@ app.post('/getContentLikedData', async(req, res) => {
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
-  
+  console.log("get previo", userName, password, docId)
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
   res.status(200).json({ "contentLiked": contentLikedData }); 
@@ -163,7 +163,7 @@ app.post('/setContentLikedData', async(req, res) => {
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
   const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
-  
+  console.log("set previo", userName, password, docId)
   const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
 
   res.status(200).json({ "setcontentLiked": contentLikedData}); 
