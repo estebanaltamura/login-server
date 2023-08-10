@@ -72,6 +72,7 @@ const getContentLikedData = async (projectCollection, docId)=>{
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
   const contentLikedValue = docSnapshotData.contentLiked
+  console.log(contentLikedValue)
   return contentLikedValue 
 }
 
