@@ -71,8 +71,7 @@ const getContentLikedData = async (projectCollection, docId)=>{
   const docRef = firestore.collection(projectCollection).doc(docId);     
   const docSnapshot = await docRef.get();    
   const docSnapshotData = docSnapshot.data()
-  const contentLikedValue = docSnapshotData.contentLiked
-  console.log(contentLikedValue)
+  const contentLikedValue = docSnapshotData.contentLiked  
   return contentLikedValue 
 }
 
@@ -149,9 +148,10 @@ app.post('/getContentLikedData', async(req, res) => {
   const projectCollection       = req.body.projectCollection 
 
   const { userName, password } = getUserNameAndPasswordFromToken(token)
-  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
-  console.log("get previo", userName, password, docId)
+  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)  
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
+
+  console.log(contentLikedData)
 
   res.status(200).json({ "contentLiked": contentLikedData }); 
 })
