@@ -18,8 +18,7 @@ const firestore = new Firestore({
 
 const encodeToken = async (userName, password)=>{
   try{
-    const privateKey = await fsAsync.readFile('/home/ubuntu/projects/login-server/privateKey.txt', 'utf8')
-    console.log(privateKey)
+    const privateKey = await fsAsync.readFile('/home/ubuntu/projects/login-server/privateKey.txt', 'utf8')    
     const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
     return token
   }
@@ -173,7 +172,7 @@ app.post('/setContentLikedData', async(req, res) => {
   const updatedData             = req.body.updatedData 
 
   const docId = await getDocIdFromToken(projectCollection, token)
-  console.log("set previo", userName, password, docId)
+  console.log(docId)
   const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
 
   res.status(200).json({ "setcontentLiked": contentLikedData}); 
