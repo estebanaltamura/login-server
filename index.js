@@ -19,6 +19,7 @@ const firestore = new Firestore({
 const encodeToken = async (userName, password)=>{
   try{
     const privateKey = await fsAsync.readFile('/privateKey.txt', 'utf8')
+    console.log(privateKey)
     const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
     return token
   }
@@ -135,10 +136,8 @@ app.post('/registerUser', async(req, res) => {
   password !== undefined  && 
   password !== ""){
 
-    const token = await encodeToken(userName, password)
+    const token = await encodeToken(userName, password)    
 
-    console.log(token)
-    
     if(token){
       const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
