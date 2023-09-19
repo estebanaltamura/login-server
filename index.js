@@ -105,15 +105,18 @@ app.post('/login', async(req, res) => {
       password !== ""){
         const token = await encodeToken(userName, password)
 
-        const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
+        if(token){
+          const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
         
-        if(isRegisteredUserResult){           
-          res.status(200).json({ message: "User logged", "token": token });     
+          if(isRegisteredUserResult){           
+            res.status(200).json({ message: "User logged", "token": token });     
+          }
+          else res.status(404).json({ message: "Wrong username or password"});
         }
-        else res.status(404).json({ message: "Wrong username or password"});
+        else res.status(500).json({ message: "Server had a problem. Try later please."})        
       }
-  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
-  
+
+  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}  
 });
 
 
@@ -133,15 +136,19 @@ app.post('/registerUser', async(req, res) => {
   password !== ""){
 
     const token = await encodeToken(userName, password)
-    const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
-    if(!isRegisteredUserResult){    
-      await addNewUser(projectCollection, token)
-      res.status(201).json({ message: "User successfully created" });
-    } 
-    else{
-      res.status(409).json({ message: "Username is already taken" });
-    }   
+    if(token){
+      const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
+
+      if(!isRegisteredUserResult){    
+        await addNewUser(projectCollection, token)
+        res.status(201).json({ message: "User successfully created" });
+      } 
+      else{
+        res.status(409).json({ message: "Username is already taken" });
+      }   
+    }
+    else res.status(500).json({ message: "Server had a problem. Try later please."})    
   }
   else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
 })   
