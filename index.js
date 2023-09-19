@@ -26,9 +26,10 @@ const isRegisteredUser = async(projectCollection, userName, password) => {
   return !querySnapshot.empty;
 }
 
-const isUniqueUserName = async(projectCollection, userName, password) => {
+const isUniqueToken = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);
-  const token = jsonWebToken.sign({ userName, password }, privateKey);  
+  const token = jsonWebToken.sign({ userName, password }, privateKey); 
+  console.log('token buscado para analizar si es unico', token) 
   const query = usersRef.where('token', '==', token);  
   const querySnapshot = await query.get();  
   return querySnapshot.empty; 
@@ -132,7 +133,7 @@ app.post('/registerUser', async(req, res) => {
   typeof password === 'string' &&
   password !== undefined  && 
   password !== ""){
-    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName, password)
+    const isUniqueUserNameResult = await isUniqueToken(projectCollection, userName, password)
     if(isUniqueUserNameResult){    
       await addNewUser(projectCollection, userName, password)
       res.status(201).json({ message: "User successfully created" });
