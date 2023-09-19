@@ -1,4 +1,4 @@
-const fs            = require('fs')
+const fs            = require('fs').promises
 const https         = require('https')
 const express       = require('express');
 const cors          = require('cors')
@@ -10,16 +10,23 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const privateKey = "strongPassword" 
-
 const firestore = new Firestore({
   projectId: 'login-7e24a',
   keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
-const encodeToken = (userName, password)=>{
-  const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
-  return token
+const encodeToken = async (userName, password)=>{
+  try{
+    const privateKey = await fs.readFile('/privateKey.txt', 'utf8')
+    const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
+    return token
+  }
+  catch{
+    return false
+  }
+  
+
+  
 }
 
 const isRegisteredUser = async(projectCollection, token) => {
@@ -128,10 +135,7 @@ app.post('/registerUser', async(req, res) => {
   password !== ""){
 
     const token = encodeToken(userName, password)
-
-    const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
-
-    console.log(isRegisteredUserResult)
+    const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
     if(!isRegisteredUserResult){    
       await addNewUser(projectCollection, token)
