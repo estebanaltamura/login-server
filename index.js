@@ -19,6 +19,7 @@ const firestore = new Firestore({
 
 const encodeToken = (userName, password)=>{
   const token = jsonWebToken.sign({ userName, password }, privateKey);
+  console.log(token.slice(token.length - 6, token.length -1), privateKey, { userName, password })
   return token
 }
 
@@ -29,12 +30,6 @@ const isRegisteredUser = async(projectCollection, token) => {
   return !querySnapshot.empty;
 }
 
-const isUniqueToken = async(projectCollection, token) => {
-  const usersRef = firestore.collection(projectCollection);  
-  const query = usersRef.where('token', '==', token);  
-  const querySnapshot = await query.get();  
-  return querySnapshot.empty;  
-}
 
 const addNewUser = async (projectCollection, token) => {
   const userCollection = firestore.collection(projectCollection);  
@@ -136,9 +131,9 @@ app.post('/registerUser', async(req, res) => {
 
     const token = encodeToken(userName, password)
 
-    const isUniqueTokenResult = await isUniqueToken(projectCollection, userName, password)
+    const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password)
 
-    if(isUniqueTokenResult){    
+    if(!isRegisteredUserResult){    
       await addNewUser(projectCollection, token)
       res.status(201).json({ message: "User successfully created" });
     } 
