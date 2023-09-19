@@ -103,7 +103,7 @@ app.post('/login', async(req, res) => {
       typeof password === 'string' &&
       password !== undefined  && 
       password !== ""){
-        const token = encodeToken(userName, password)
+        const token = await encodeToken(userName, password)
 
         const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
         
@@ -132,7 +132,7 @@ app.post('/registerUser', async(req, res) => {
   password !== undefined  && 
   password !== ""){
 
-    const token = encodeToken(userName, password)
+    const token = await encodeToken(userName, password)
     const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
     if(!isRegisteredUserResult){    
