@@ -18,7 +18,7 @@ const firestore = new Firestore({
 });
 
 const encodeToken = (userName, password)=>{
-  const token = jsonWebToken.sign({ userName, password }, privateKey);
+  const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });
   console.log(token.slice(token.length - 6, token.length -1), privateKey, { userName, password })
   return token
 }
