@@ -18,7 +18,7 @@ const firestore = new Firestore({
 
 const encodeToken = async (userName, password)=>{
   try{
-    const privateKey = await fsAsync.readFile('/privateKey.txt', 'utf8')
+    const privateKey = await fsAsync.readFile('/ubuntu/home/projects/login-server/privateKey.txt', 'utf8')
     console.log(privateKey)
     const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
     return token
