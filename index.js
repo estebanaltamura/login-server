@@ -1,4 +1,5 @@
-const fs            = require('fs').promises
+const fs            = require('fs')
+const fsAsync       = require('fs').promises
 const https         = require('https')
 const express       = require('express');
 const cors          = require('cors')
