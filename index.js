@@ -45,17 +45,6 @@ const addNewUser = async (projectCollection, token) => {
   await userCollection.add(newUser);  
 }
 
-
-// const getUserNameAndPasswordFromToken = (token) =>{
-//   try {
-//     const decodedToken = jsonWebToken.verify(token, privateKey);
-//     return { userName: decodedToken.userName, password: decodedToken.password };
-//   } catch (error) {    
-//     console.error("Error al verificar el token:", error.message);
-//     return false;
-//   }
-// }
-
 const getDocIdFromToken = async (projectCollection, token)=>{ 
   const usersRef = firestore.collection(projectCollection);  
   const query = usersRef.where('token', '==', token);    
@@ -69,17 +58,23 @@ const getDocIdFromToken = async (projectCollection, token)=>{
 }
 
 const getContentLikedData = async (projectCollection, docId)=>{
-  const docRef = firestore.collection(projectCollection).doc(docId);     
-  const docSnapshot = await docRef.get();    
-  const docSnapshotData = docSnapshot.data()
-  const contentLikedValue = docSnapshotData.contentLiked  
-  return contentLikedValue 
+  try{
+    const docRef = firestore.collection(projectCollection).doc(docId);     
+    const docSnapshot = await docRef.get();    
+    const docSnapshotData = docSnapshot.data()
+    const contentLikedValue = docSnapshotData.contentLiked  
+    return contentLikedValue 
+  }
+  catch(error){
+    console.error('Error al solicitar documento', error)
+  }
+  
 }
 
 const setContentLikedData = async (projectCollection, docId, updatedData)=>{  
   try{
-  const docRef = firestore.collection(projectCollection).doc(docId);     
-  await docRef.update(updatedData);
+    const docRef = firestore.collection(projectCollection).doc(docId);     
+    await docRef.update(updatedData);
     console.log('Documento actualizado exitosamente');
   } 
 
@@ -87,8 +82,6 @@ const setContentLikedData = async (projectCollection, docId, updatedData)=>{
     console.error('Error al actualizar el documento:', error);
   }
 }
-
-
 
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
