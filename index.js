@@ -137,6 +137,8 @@ app.post('/registerUser', async(req, res) => {
 
     const token = await encodeToken(userName, password)
 
+    console.log(token)
+    
     if(token){
       const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
