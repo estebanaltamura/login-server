@@ -28,8 +28,9 @@ const isRegisteredUser = async(projectCollection, userName, password) => {
 
 const isUniqueToken = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);
-  const token = jsonWebToken.sign({ userName, password }, privateKey); 
-  console.log(userName, password, 'token buscado para analizar si es unico', token) 
+  const payload = {userName, password}
+  const token = jsonWebToken.sign(payload, privateKey); 
+  console.log(payload, 'token buscado para analizar si es unico', token) 
   const query = usersRef.where('token', '==', token);  
   const querySnapshot = await query.get();  
   return querySnapshot.empty; 
