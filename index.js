@@ -41,7 +41,7 @@ const addNewUser = async (projectCollection, userName, password) => {
   const payload = {userName, password}
   const token = jsonWebToken.sign(payload, privateKey);
 
-  console.log(token.slice(token.length-6, token.length-1))
+  console.log(payload, privateKey, token.slice(token.length-6, token.length-1))
 
   const newUser = {
     token,    
