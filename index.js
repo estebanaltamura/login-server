@@ -17,31 +17,26 @@ const firestore = new Firestore({
   keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
-const isRegisteredUser = async(projectCollection, userName, password) => {
+const encodeToken = (userName, password)=>{
+  const token = jsonWebToken.sign({ userName, password }, privateKey);
+}
+
+const isRegisteredUser = async(projectCollection, token) => {
   const usersRef = firestore.collection(projectCollection);  
-  const token = jsonWebToken.sign({ userName, password }, privateKey); 
   const query = usersRef.where('token', '==', token);
-  
   const querySnapshot = await query.get();
   return !querySnapshot.empty;
 }
 
-const isUniqueToken = async(projectCollection, userName, password) => {
-  const usersRef = firestore.collection(projectCollection);
-  const payload = {userName, password}
-  const token = jsonWebToken.sign(payload, privateKey); 
-  
+const isUniqueToken = async(projectCollection, token) => {
+  const usersRef = firestore.collection(projectCollection);  
   const query = usersRef.where('token', '==', token);  
   const querySnapshot = await query.get();  
-  return querySnapshot.empty; 
+  return querySnapshot.empty;  
 }
 
-const addNewUser = async (projectCollection, userName, password) => {
-  const userCollection = firestore.collection(projectCollection);
-  const payload = {userName, password}
-  const token = jsonWebToken.sign(payload, privateKey);
-
-  console.log(payload, privateKey, token.slice(token.length-6, token.length-1))
+const addNewUser = async (projectCollection, token) => {
+  const userCollection = firestore.collection(projectCollection);  
 
   const newUser = {
     token,    
@@ -98,9 +93,7 @@ const setContentLikedData = async (projectCollection, docId, updatedData)=>{
 app.post('/login', async(req, res) => {  
   const projectCollection = req.body.projectCollection 
   const userName          = req.body.userName;
-  const password          = req.body.password;
-
-  console.log(projectCollection, userName, password)
+  const password          = req.body.password;  
 
   if( typeof projectCollection === 'string' && 
       projectCollection !== undefined && 
@@ -111,9 +104,11 @@ app.post('/login', async(req, res) => {
       typeof password === 'string' &&
       password !== undefined  && 
       password !== ""){
-        const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password)
-        if(isRegisteredUserResult){
-          const token = jsonWebToken.sign({ userName, password }, privateKey); 
+        const token = encodeToken(userName, password)
+
+        const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
+        
+        if(isRegisteredUserResult){           
           res.status(200).json({ message: "User logged", "token": token });     
         }
         else res.status(404).json({ message: "Wrong username or password"});
@@ -137,9 +132,13 @@ app.post('/registerUser', async(req, res) => {
   typeof password === 'string' &&
   password !== undefined  && 
   password !== ""){
-    const isUniqueUserNameResult = await isUniqueToken(projectCollection, userName, password)
-    if(isUniqueUserNameResult){    
-      await addNewUser(projectCollection, userName, password)
+
+    const token = encodeToken(userName, password)
+
+    const isUniqueTokenResult = await isUniqueToken(projectCollection, userName, password)
+
+    if(isUniqueTokenResult){    
+      await addNewUser(projectCollection, token)
       res.status(201).json({ message: "User successfully created" });
     } 
     else{
