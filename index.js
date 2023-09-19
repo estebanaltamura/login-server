@@ -129,9 +129,10 @@ app.post('/registerUser', async(req, res) => {
 
     const token = encodeToken(userName, password)
 
-    const isRegisteredUserResult = await isRegisteredUser(projectCollection, userName, password)
+    const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
 
     console.log(isRegisteredUserResult)
+
     if(!isRegisteredUserResult){    
       await addNewUser(projectCollection, token)
       res.status(201).json({ message: "User successfully created" });
