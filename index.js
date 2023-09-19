@@ -23,7 +23,8 @@ const encodeToken = async (userName, password)=>{
     const token = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
     return token
   }
-  catch{
+  catch(err){
+    console.log(err)
     return false
   }  
 }
