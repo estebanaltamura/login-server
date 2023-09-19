@@ -1,4 +1,4 @@
-const fs            =require('fs')
+const fs            = require('fs')
 const https         = require('https')
 const express       = require('express');
 const cors          = require('cors')
@@ -29,7 +29,7 @@ const isRegisteredUser = async(projectCollection, userName, password) => {
 const isUniqueToken = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);
   const token = jsonWebToken.sign({ userName, password }, privateKey); 
-  console.log('token buscado para analizar si es unico', token) 
+  console.log('token buscado para analizar si es unico', token, userName, password) 
   const query = usersRef.where('token', '==', token);  
   const querySnapshot = await query.get();  
   return querySnapshot.empty; 
