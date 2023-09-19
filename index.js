@@ -19,26 +19,27 @@ const firestore = new Firestore({
 
 const isRegisteredUser = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);  
-  const query = usersRef.where('userName', '==', userName).where('password', '==', password);
+  const token = jsonWebToken.sign({ userName, password }, privateKey); 
+  const query = usersRef.where('token', '==', token);
   
   const querySnapshot = await query.get();
   return !querySnapshot.empty;
 }
 
-const isUniqueUserName = async(projectCollection, userName) => {
+const isUniqueUserName = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);
-  const query = usersRef.where('userName', '==', userName);
-  
-  const querySnapshot = await query.get();
+  const token = jsonWebToken.sign({ userName, password }, privateKey);  
+  const query = usersRef.where('token', '==', token);  
+  const querySnapshot = await query.get();  
   return querySnapshot.empty; 
 }
 
 const addNewUser = async (projectCollection, userName, password) => {
   const userCollection = firestore.collection(projectCollection);
+  const token = jsonWebToken.sign({ userName, password }, privateKey);
 
   const newUser = {
-    userName: userName,
-    password: password,
+    token,    
     contentLiked: {'movies': [], 'tvSeries': [], 'allFavorites': []}
   }
   await userCollection.add(newUser);  
@@ -131,7 +132,7 @@ app.post('/registerUser', async(req, res) => {
   typeof password === 'string' &&
   password !== undefined  && 
   password !== ""){
-    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName)
+    const isUniqueUserNameResult = await isUniqueUserName(projectCollection, userName, password)
     if(isUniqueUserNameResult){    
       await addNewUser(projectCollection, userName, password)
       res.status(201).json({ message: "User successfully created" });
@@ -168,11 +169,6 @@ app.post('/setContentLikedData', async(req, res) => {
 
   res.status(200).json({ "setcontentLiked": contentLikedData}); 
 })
-
-
-
-
-
 
 
 const options = {
