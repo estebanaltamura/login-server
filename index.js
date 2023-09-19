@@ -19,6 +19,7 @@ const firestore = new Firestore({
 
 const encodeToken = (userName, password)=>{
   const token = jsonWebToken.sign({ userName, password }, privateKey);
+  return token
 }
 
 const isRegisteredUser = async(projectCollection, token) => {
