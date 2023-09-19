@@ -46,19 +46,19 @@ const addNewUser = async (projectCollection, userName, password) => {
 }
 
 
-const getUserNameAndPasswordFromToken = (token) =>{
-  try {
-    const decodedToken = jsonWebToken.verify(token, privateKey);
-    return { userName: decodedToken.userName, password: decodedToken.password };
-  } catch (error) {    
-    console.error("Error al verificar el token:", error.message);
-    return false;
-  }
-}
+// const getUserNameAndPasswordFromToken = (token) =>{
+//   try {
+//     const decodedToken = jsonWebToken.verify(token, privateKey);
+//     return { userName: decodedToken.userName, password: decodedToken.password };
+//   } catch (error) {    
+//     console.error("Error al verificar el token:", error.message);
+//     return false;
+//   }
+// }
 
-const getDocIdFromUserNameAndPassword = async (projectCollection, userName, password)=>{ 
+const getDocIdFromToken = async (projectCollection, token)=>{ 
   const usersRef = firestore.collection(projectCollection);  
-  const query = usersRef.where('userName', '==', userName).where('password', '==', password);    
+  const query = usersRef.where('token', '==', token);    
   const querySnapshot = await query.get();
   
   if (querySnapshot.empty) {
@@ -147,9 +147,8 @@ app.post('/registerUser', async(req, res) => {
 app.post('/getContentLikedData', async(req, res) => {  
   const token                   = req.body.token;
   const projectCollection       = req.body.projectCollection 
-
-  const { userName, password } = getUserNameAndPasswordFromToken(token)
-  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)  
+  
+  const docId = await getDocIdFromToken(projectCollection, token)  
   const contentLikedData = await getContentLikedData(projectCollection, docId) 
 
   console.log(contentLikedData)
@@ -162,8 +161,7 @@ app.post('/setContentLikedData', async(req, res) => {
   const projectCollection       = req.body.projectCollection 
   const updatedData             = req.body.updatedData 
 
-  const { userName, password } = getUserNameAndPasswordFromToken(token)
-  const docId = await getDocIdFromUserNameAndPassword(projectCollection, userName, password)
+  const docId = await getDocIdFromToken(projectCollection, token)
   console.log("set previo", userName, password, docId)
   const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
 
