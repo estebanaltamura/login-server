@@ -24,10 +24,7 @@ const encodeToken = async (userName, password)=>{
   }
   catch{
     return false
-  }
-  
-
-  
+  }  
 }
 
 const isRegisteredUser = async(projectCollection, token) => {
