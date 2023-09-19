@@ -30,7 +30,7 @@ const isUniqueToken = async(projectCollection, userName, password) => {
   const usersRef = firestore.collection(projectCollection);
   const payload = {userName, password}
   const token = jsonWebToken.sign(payload, privateKey); 
-  console.log(payload, 'token buscado para analizar si es unico', token) 
+  
   const query = usersRef.where('token', '==', token);  
   const querySnapshot = await query.get();  
   return querySnapshot.empty; 
@@ -38,7 +38,10 @@ const isUniqueToken = async(projectCollection, userName, password) => {
 
 const addNewUser = async (projectCollection, userName, password) => {
   const userCollection = firestore.collection(projectCollection);
-  const token = jsonWebToken.sign({ userName, password }, privateKey);
+  const payload = {userName, password}
+  const token = jsonWebToken.sign(payload, privateKey);
+
+  console.log(token.slice(token.length-6, token.length-1))
 
   const newUser = {
     token,    
