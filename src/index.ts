@@ -36,6 +36,7 @@ const encodeToken = async (userName: string, password: string): Promise<string |
 }
 
 const isRegisteredUser = async(projectCollection: string, token: string): Promise<boolean | null> => {
+  console.log(token)
   const usersRef = firestore.collection(projectCollection);  
   const query = usersRef.where('token', '==', token);
   try{

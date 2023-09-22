@@ -29,6 +29,7 @@ const encodeToken = async (userName, password) => {
     }
 };
 const isRegisteredUser = async (projectCollection, token) => {
+    console.log(token);
     const usersRef = firestore.collection(projectCollection);
     const query = usersRef.where('token', '==', token);
     try {
