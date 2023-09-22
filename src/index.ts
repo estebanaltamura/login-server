@@ -175,6 +175,7 @@ app.post('/registerUser', async(req: RequestRegisterLoginInterface, res: Respons
 app.post('/googleLogin', async(req: RequestGoogleLoginInterface, res: Response) => {
   const { projectCollection, token} = req.body 
 
+  console.log(projectCollection, token)
   if(token){
     const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
 
