@@ -156,16 +156,16 @@ app.post('/registerUser', async (req, res) => {
     }
 });
 app.post('/googleLogin', async (req, res) => {
-    const { projectCollection, token } = req.body;
-    console.log(projectCollection, token);
-    if (token) {
-        const isRegisteredUserResult = await isRegisteredUser(projectCollection, token);
+    const { projectCollection, tokenFromGoogle } = req.body;
+    console.log(projectCollection, tokenFromGoogle);
+    if (tokenFromGoogle) {
+        const isRegisteredUserResult = await isRegisteredUser(projectCollection, tokenFromGoogle);
         if (isRegisteredUserResult === false) {
-            await addNewUser(projectCollection, token);
-            res.status(201).json({ message: "User successfully created", "token": token });
+            await addNewUser(projectCollection, tokenFromGoogle);
+            res.status(201).json({ message: "User successfully created", "token": tokenFromGoogle });
         }
         else if (isRegisteredUserResult === true)
-            res.status(200).json({ message: "User logged", "token": token });
+            res.status(200).json({ message: "User logged", "token": tokenFromGoogle });
         else
             res.status(500).json({ message: "Server had a problem. Try later please." });
     }

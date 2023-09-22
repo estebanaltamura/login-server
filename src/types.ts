@@ -13,7 +13,7 @@ interface RequestGoogleLoginInterface extends Request {
   body:
     {
       projectCollection: string, 
-      token: string      
+      tokenFromGoogle: string      
     }
 }
 
