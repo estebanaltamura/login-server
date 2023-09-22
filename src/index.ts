@@ -6,8 +6,8 @@ import bodyParser from 'body-parser'
 import jsonWebToken from 'jsonwebtoken'
 import { Firestore, DocumentSnapshot } from '@google-cloud/firestore'
 import { Response } from 'express';
-import { RequestLoginInterface, 
-  RequestRegisterInterface, 
+import { RequestRegisterLoginInterface, 
+  RequestGoogleLoginInterface,
   RequestGetContentInterface, 
   RequestSetContentInterface,
   ContentLikedInterface,
@@ -129,7 +129,7 @@ const areValidValues = (projectCollection: string, userName:string, password:str
   return false
 }
 
-app.post('/login', async(req: RequestLoginInterface, res: Response) => {   
+app.post('/login', async(req: RequestRegisterLoginInterface, res: Response) => {   
   const { projectCollection, userName, password } = req.body
 
   if(areValidValues(projectCollection, userName, password)){
@@ -150,7 +150,7 @@ app.post('/login', async(req: RequestLoginInterface, res: Response) => {
 });
 
 
-app.post('/registerUser', async(req: RequestRegisterInterface, res: Response) => {
+app.post('/registerUser', async(req: RequestRegisterLoginInterface, res: Response) => {
   const { projectCollection, userName, password} = req.body 
 
   if(areValidValues(projectCollection, userName, password)){
@@ -171,6 +171,22 @@ app.post('/registerUser', async(req: RequestRegisterInterface, res: Response) =>
   }
   else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
 })   
+
+app.post('/googleLogin', async(req: RequestGoogleLoginInterface, res: Response) => {
+  const { projectCollection, token} = req.body 
+
+  if(token){
+    const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
+
+    if(isRegisteredUserResult === false){    
+      await addNewUser(projectCollection, token)
+      res.status(201).json({ message: "User successfully created" });
+    } 
+    else if(isRegisteredUserResult === true) res.status(200).json({ message: "User logged", "token": token }); 
+    else res.status(500).json({ message: "Server had a problem. Try later please."})         
+  }
+  else res.status(500).json({ message: "Server had a problem. Try later please."})      
+}) 
 
 app.post('/getContentLikedData', async(req: RequestGetContentInterface, res: Response) => {  
   const { token, projectCollection } = req.body  

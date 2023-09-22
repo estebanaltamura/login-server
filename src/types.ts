@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-interface RequestLoginInterface extends Request {
+interface RequestRegisterLoginInterface extends Request {
   body:
     {
       projectCollection: string, 
@@ -9,14 +9,14 @@ interface RequestLoginInterface extends Request {
     }
 }
 
-interface RequestRegisterInterface extends Request {
+interface RequestGoogleLoginInterface extends Request {
   body:
     {
       projectCollection: string, 
-      userName: string, 
-      password: string 
+      token: string      
     }
 }
+
 
 interface RequestGetContentInterface extends Request {
   body:
@@ -45,8 +45,8 @@ interface UpdatedData{
 
 
 export {
-  RequestLoginInterface,
-  RequestRegisterInterface,
+  RequestRegisterLoginInterface,
+  RequestGoogleLoginInterface,
   RequestGetContentInterface,
   RequestSetContentInterface,
   ContentLikedInterface,
