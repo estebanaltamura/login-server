@@ -15,7 +15,7 @@ app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 const firestore = new firestore_1.Firestore({
     projectId: 'login-7e24a',
-    keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
+    keyFilename: '/home/ubuntu/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 const encodeToken = async (userName, password) => {
     try {
