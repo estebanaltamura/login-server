@@ -180,7 +180,7 @@ app.post('/googleLogin', async(req: RequestGoogleLoginInterface, res: Response) 
 
     if(isRegisteredUserResult === false){    
       await addNewUser(projectCollection, token)
-      res.status(201).json({ message: "User successfully created" });
+      res.status(201).json({ message: "User successfully created", "token": token });
     } 
     else if(isRegisteredUserResult === true) res.status(200).json({ message: "User logged", "token": token }); 
     else res.status(500).json({ message: "Server had a problem. Try later please."})         
