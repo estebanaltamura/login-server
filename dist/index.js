@@ -15,7 +15,7 @@ app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 const firestore = new firestore_1.Firestore({
     projectId: 'login-7e24a',
-    keyFilename: '/home/ubuntu/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
+    keyFilename: '/home/ubuntu/projects/login-server/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 const encodeToken = async (userName, password) => {
     try {
@@ -154,6 +154,23 @@ app.post('/registerUser', async (req, res) => {
     else {
         res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values" });
     }
+});
+app.post('/googleLogin', async (req, res) => {
+    const { projectCollection, token } = req.body;
+    console.log(projectCollection, token);
+    if (token) {
+        const isRegisteredUserResult = await isRegisteredUser(projectCollection, token);
+        if (isRegisteredUserResult === false) {
+            await addNewUser(projectCollection, token);
+            res.status(201).json({ message: "User successfully created", "token": token });
+        }
+        else if (isRegisteredUserResult === true)
+            res.status(200).json({ message: "User logged", "token": token });
+        else
+            res.status(500).json({ message: "Server had a problem. Try later please." });
+    }
+    else
+        res.status(500).json({ message: "Server had a problem. Try later please." });
 });
 app.post('/getContentLikedData', async (req, res) => {
     const { token, projectCollection } = req.body;
