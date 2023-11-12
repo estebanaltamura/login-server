@@ -1,18 +1,19 @@
-import fs from 'fs'
-import https from 'https'
-import express from 'express'
-import cors from 'cors'
-import bodyParser from 'body-parser'
-import jsonWebToken from 'jsonwebtoken'
-import { Firestore, DocumentSnapshot } from '@google-cloud/firestore'
+import fs from 'fs';
+import https from 'https';
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import jsonWebToken from 'jsonwebtoken';
+import { Firestore, DocumentSnapshot } from '@google-cloud/firestore';
 import { Response } from 'express';
-import { RequestRegisterLoginInterface, 
+import {
+  RequestRegisterLoginInterface,
   RequestGoogleLoginInterface,
-  RequestGetContentInterface, 
+  RequestGetContentInterface,
   RequestSetContentInterface,
   ContentLikedInterface,
-  UpdatedData } from './types'
-
+  UpdatedData,
+} from './types';
 
 const app = express();
 app.use(cors());
@@ -20,212 +21,305 @@ app.use(bodyParser.json());
 
 const firestore = new Firestore({
   projectId: 'login-7e24a',
-  keyFilename: '/home/ubuntu/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
+  keyFilename:
+    '/home/ubuntu/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
-const encodeToken = async (userName: string, password: string): Promise<string | null>=>{
-  try{
-    const privateKey: string = await fs.promises.readFile('/home/ubuntu/projects/login-server/privateKey.txt', 'utf8')    
-    const token:string = jsonWebToken.sign({ userName, password }, privateKey, { noTimestamp: true });  
-    return token
+const encodeToken = async (
+  userName: string,
+  password: string
+): Promise<string | null> => {
+  try {
+    const privateKey: string = await fs.promises.readFile(
+      '/home/ubuntu/projects/login-server/privateKey.txt',
+      'utf8'
+    );
+    const token: string = jsonWebToken.sign(
+      { userName, password },
+      privateKey,
+      { noTimestamp: true }
+    );
+    return token;
+  } catch (error) {
+    console.error('Error tokenizando userName y password', error);
+    return null;
   }
-  catch(error){
-    console.error('Error tokenizando userName y password', error)
-    return null
-  }  
-}
+};
 
-const isRegisteredUser = async(projectCollection: string, token: string): Promise<boolean | null> => {
-  console.log(token)
-  const usersRef = firestore.collection(projectCollection);  
+const isRegisteredUser = async (
+  projectCollection: string,
+  token: string
+): Promise<boolean | null> => {
+  console.log(token);
+  const usersRef = firestore.collection(projectCollection);
   const query = usersRef.where('token', '==', token);
-  try{
+  try {
     const querySnapshot = await query.get();
     return !querySnapshot.empty;
+  } catch (error) {
+    console.error('Error comprobando si el usuario esta registrado', error);
+    return null;
   }
-  catch(error){
-    console.error('Error comprobando si el usuario esta registrado', error)
-    return null
-  }  
-}
+};
 
-const addNewUser = async (projectCollection: string, token: string):Promise<void | null> => {
-  const userCollection = firestore.collection(projectCollection);  
+const addNewUser = async (
+  projectCollection: string,
+  token: string
+): Promise<void | null> => {
+  const userCollection = firestore.collection(projectCollection);
 
   const newUser = {
-    token,    
-    contentLiked: {'movies': [], 'tvSeries': [], 'allFavorites': []}
-  }
+    token,
+    contentLiked: { movies: [], tvSeries: [], allFavorites: [] },
+  };
 
-  try{
+  try {
     await userCollection.add(newUser);
+  } catch (error) {
+    console.error('Error creando usuario', error);
+    return null;
   }
-  catch(error){
-    console.error('Error creando usuario', error)
-    return null
-  }    
-}
+};
 
-const getDocIdFromToken = async (projectCollection: string, token: string): Promise<false | string | null>=>{ 
-  const usersRef = firestore.collection(projectCollection);  
-  const query = usersRef.where('token', '==', token); 
-  
-  try{
+const getDocIdFromToken = async (
+  projectCollection: string,
+  token: string
+): Promise<false | string | null> => {
+  const usersRef = firestore.collection(projectCollection);
+  const query = usersRef.where('token', '==', token);
+
+  try {
     const querySnapshot = await query.get();
-  
+
     if (querySnapshot.empty) {
-      return false; 
-    } else {      
+      return false;
+    } else {
       return querySnapshot.docs[0].id;
-    } 
-  }
-  catch(error){
-    console.error('Error buscando id del documento', error)
-    return null
-  }   
-}
-
-const getContentLikedData = async (projectCollection: string, docId: string): Promise<Object | null | false>=>{
-  
-  try{
-    const docRef = firestore.collection(projectCollection).doc(docId);     
-    const docSnapshot: DocumentSnapshot = await docRef.get();    
-    const docSnapshotData: ContentLikedInterface | undefined = docSnapshot.data()
-    
-    if(docSnapshotData){      
-        const contentLikedValue: Object = docSnapshotData.contentLiked as Object
-        return contentLikedValue       
     }
-    else return false      
+  } catch (error) {
+    console.error('Error buscando id del documento', error);
+    return null;
   }
-  catch(error){
-    console.error('Error al solicitar documento', error)
-    return null
-  }  
-}
+};
 
-const setContentLikedData = async (projectCollection: string, docId: string, updatedData: UpdatedData): Promise<void | null>=>{  
-  try{
-    const docRef = firestore.collection(projectCollection).doc(docId);     
-    await docRef.update(updatedData);    
-  } 
-  catch (error) {
+const getContentLikedData = async (
+  projectCollection: string,
+  docId: string
+): Promise<Object | null | false> => {
+  try {
+    const docRef = firestore.collection(projectCollection).doc(docId);
+    const docSnapshot: DocumentSnapshot = await docRef.get();
+    const docSnapshotData: ContentLikedInterface | undefined =
+      docSnapshot.data();
+
+    if (docSnapshotData) {
+      const contentLikedValue: Object = docSnapshotData.contentLiked as Object;
+      return contentLikedValue;
+    } else return false;
+  } catch (error) {
+    console.error('Error al solicitar documento', error);
+    return null;
+  }
+};
+
+const setContentLikedData = async (
+  projectCollection: string,
+  docId: string,
+  updatedData: UpdatedData
+): Promise<void | null> => {
+  try {
+    const docRef = firestore.collection(projectCollection).doc(docId);
+    await docRef.update(updatedData);
+  } catch (error) {
     console.error('Error al actualizar el documento:', error);
-    return null
+    return null;
   }
-}
+};
 
-const areValidValues = (projectCollection: string, userName:string, password:string): boolean=>{
-  if( typeof projectCollection === 'string' && 
-  projectCollection !== undefined && 
-  projectCollection !== "" &&   
-  typeof userName === 'string' && 
-  userName !== undefined && 
-  userName !== "" &&   
-  typeof password === 'string' &&
-  password !== undefined  && 
-  password !== ""){
-    return true
+const areValidValues = (
+  projectCollection: string,
+  userName: string,
+  password: string
+): boolean => {
+  if (
+    typeof projectCollection === 'string' &&
+    projectCollection !== undefined &&
+    projectCollection !== '' &&
+    typeof userName === 'string' &&
+    userName !== undefined &&
+    userName !== '' &&
+    typeof password === 'string' &&
+    password !== undefined &&
+    password !== ''
+  ) {
+    return true;
   }
-  return false
-}
+  return false;
+};
 
-app.post('/login', async(req: RequestRegisterLoginInterface, res: Response) => {   
-  const { projectCollection, userName, password } = req.body
+app.post(
+  '/login',
+  async (req: RequestRegisterLoginInterface, res: Response) => {
+    const { projectCollection, userName, password } = req.body;
 
-  if(areValidValues(projectCollection, userName, password)){
-        const token = await encodeToken(userName, password)
+    if (areValidValues(projectCollection, userName, password)) {
+      const token = await encodeToken(userName, password);
 
-        if(token){
-          const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)
-        
-          if(isRegisteredUserResult){           
-            res.status(200).json({ message: "User logged", "token": token });     
-          }
-          else if(isRegisteredUserResult === false) res.status(404).json({ message: "Wrong username or password"});
-          else res.status(500).json({ message: "Server had a problem. Try later please."})
-        }
-        else res.status(500).json({ message: "Server had a problem. Try later please."})        
-      }
-  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}  
-});
+      if (token) {
+        const isRegisteredUserResult = await isRegisteredUser(
+          projectCollection,
+          token
+        );
 
-
-app.post('/registerUser', async(req: RequestRegisterLoginInterface, res: Response) => {
-  const { projectCollection, userName, password} = req.body 
-
-  if(areValidValues(projectCollection, userName, password)){
-    const token = await encodeToken(userName, password)    
-
-    if(token){
-      const isRegisteredUserResult = await isRegisteredUser(projectCollection, token)    
-
-      if(isRegisteredUserResult === false){    
-        await addNewUser(projectCollection, token)
-        res.status(201).json({ message: "User successfully created" });
-      } 
-      else if(isRegisteredUserResult === true) res.status(409).json({ message: "Username is already taken" });
-      else res.status(500).json({ message: "Server had a problem. Try later please."})
-         
+        if (isRegisteredUserResult) {
+          res.status(200).json({ message: 'User logged', token: token });
+        } else if (isRegisteredUserResult === false)
+          res.status(404).json({ message: 'Wrong username or password' });
+        else
+          res
+            .status(500)
+            .json({ message: 'Server had a problem. Try later please.' });
+      } else
+        res
+          .status(500)
+          .json({ message: 'Server had a problem. Try later please.' });
+    } else {
+      res
+        .status(400)
+        .json({
+          message:
+            "Bad request. The parameters must be string and they mustn't be empty values",
+        });
     }
-    else res.status(500).json({ message: "Server had a problem. Try later please."})    
   }
-  else{res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values"})}
-})   
+);
 
-app.post('/googleLogin', async(req: RequestGoogleLoginInterface, res: Response) => {
-  const { projectCollection, tokenFromGoogle } = req.body 
+app.post(
+  '/registerUser',
+  async (req: RequestRegisterLoginInterface, res: Response) => {
+    console.log('entro');
+    const { projectCollection, userName, password } = req.body;
 
-  console.log(projectCollection, tokenFromGoogle)
-  if(tokenFromGoogle){
-    const isRegisteredUserResult = await isRegisteredUser(projectCollection, tokenFromGoogle)    
+    if (areValidValues(projectCollection, userName, password)) {
+      const token = await encodeToken(userName, password);
 
-    if(isRegisteredUserResult === false){    
-      await addNewUser(projectCollection, tokenFromGoogle)
-      res.status(201).json({ message: "User successfully created", "token": tokenFromGoogle });
-    } 
-    else if(isRegisteredUserResult === true) res.status(200).json({ message: "User logged", "token": tokenFromGoogle }); 
-    else res.status(500).json({ message: "Server had a problem. Try later please."})         
+      if (token) {
+        const isRegisteredUserResult = await isRegisteredUser(
+          projectCollection,
+          token
+        );
+
+        if (isRegisteredUserResult === false) {
+          await addNewUser(projectCollection, token);
+          res.status(201).json({ message: 'User successfully created' });
+        } else if (isRegisteredUserResult === true)
+          res.status(409).json({ message: 'Username is already taken' });
+        else
+          res
+            .status(500)
+            .json({ message: 'Server had a problem. Try later please.' });
+      } else
+        res
+          .status(500)
+          .json({ message: 'Server had a problem. Try later please.' });
+    } else {
+      res
+        .status(400)
+        .json({
+          message:
+            "Bad request. The parameters must be string and they mustn't be empty values",
+        });
+    }
   }
-  else res.status(500).json({ message: "Server had a problem. Try later please."})      
-}) 
+);
 
-app.post('/getContentLikedData', async(req: RequestGetContentInterface, res: Response) => {  
-  const { token, projectCollection } = req.body  
-  
-  const docId = await getDocIdFromToken(projectCollection, token)  
-  
-  if(docId){
-    const contentLikedData = await getContentLikedData(projectCollection, docId)    
-    res.status(200).json({ "contentLiked": contentLikedData });
+app.post(
+  '/googleLogin',
+  async (req: RequestGoogleLoginInterface, res: Response) => {
+    const { projectCollection, tokenFromGoogle } = req.body;
+
+    console.log(projectCollection, tokenFromGoogle);
+    if (tokenFromGoogle) {
+      const isRegisteredUserResult = await isRegisteredUser(
+        projectCollection,
+        tokenFromGoogle
+      );
+
+      if (isRegisteredUserResult === false) {
+        await addNewUser(projectCollection, tokenFromGoogle);
+        res
+          .status(201)
+          .json({
+            message: 'User successfully created',
+            token: tokenFromGoogle,
+          });
+      } else if (isRegisteredUserResult === true)
+        res
+          .status(200)
+          .json({ message: 'User logged', token: tokenFromGoogle });
+      else
+        res
+          .status(500)
+          .json({ message: 'Server had a problem. Try later please.' });
+    } else
+      res
+        .status(500)
+        .json({ message: 'Server had a problem. Try later please.' });
   }
-  else res.status(500).json({ message: "Server had a problem. Try later please."})    
-})
+);
 
-app.post('/setContentLikedData', async(req: RequestSetContentInterface, res: Response) => {  
-  const { token, projectCollection, updatedData } = req.body  
+app.post(
+  '/getContentLikedData',
+  async (req: RequestGetContentInterface, res: Response) => {
+    const { token, projectCollection } = req.body;
 
-  const docId = await getDocIdFromToken(projectCollection, token)
-  
-  if(docId){
-    const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData) 
-    res.status(200).json({ "setcontentLiked": contentLikedData});
+    const docId = await getDocIdFromToken(projectCollection, token);
+
+    if (docId) {
+      const contentLikedData = await getContentLikedData(
+        projectCollection,
+        docId
+      );
+      res.status(200).json({ contentLiked: contentLikedData });
+    } else
+      res
+        .status(500)
+        .json({ message: 'Server had a problem. Try later please.' });
   }
-  else res.status(500).json({ message: "Server had a problem. Try later please."})   
-})
+);
+
+app.post(
+  '/setContentLikedData',
+  async (req: RequestSetContentInterface, res: Response) => {
+    const { token, projectCollection, updatedData } = req.body;
+
+    const docId = await getDocIdFromToken(projectCollection, token);
+
+    if (docId) {
+      const contentLikedData = await setContentLikedData(
+        projectCollection,
+        docId,
+        updatedData
+      );
+      res.status(200).json({ setcontentLiked: contentLikedData });
+    } else
+      res
+        .status(500)
+        .json({ message: 'Server had a problem. Try later please.' });
+  }
+);
 
 const options = {
   key: fs.readFileSync('/etc/cert/privkey.pem'),
-  cert: fs.readFileSync('/etc/cert/fullchain.pem')
+  cert: fs.readFileSync('/etc/cert/fullchain.pem'),
 };
 
 const server = https.createServer(options, app);
-const port = 3100
+const port = 3100;
 
 server.listen(port, () => {
   console.log(`Servidor HTTPS escuchando en el puerto ${port}`);
 });
-
 
 /*
 
@@ -263,12 +357,4 @@ server.listen(port, () => {
     -Si el usuario se loguea con el servicio por email y contraseña mio, el retorno del servicio se aasigna a un estado
     -Si elige por google, algun identicador unico que retorne y usemos para registrar
 
-*/ 
-
-
-
-
-
-
-
-
+*/
