@@ -45,7 +45,7 @@ const addNewUser = async (projectCollection, token) => {
     const userCollection = firestore.collection(projectCollection);
     const newUser = {
         token,
-        contentLiked: { 'movies': [], 'tvSeries': [], 'allFavorites': [] }
+        contentLiked: { movies: [], tvSeries: [], allFavorites: [] },
     };
     try {
         await userCollection.add(newUser);
@@ -102,13 +102,13 @@ const setContentLikedData = async (projectCollection, docId, updatedData) => {
 const areValidValues = (projectCollection, userName, password) => {
     if (typeof projectCollection === 'string' &&
         projectCollection !== undefined &&
-        projectCollection !== "" &&
+        projectCollection !== '' &&
         typeof userName === 'string' &&
         userName !== undefined &&
-        userName !== "" &&
+        userName !== '' &&
         typeof password === 'string' &&
         password !== undefined &&
-        password !== "") {
+        password !== '') {
         return true;
     }
     return false;
@@ -120,21 +120,28 @@ app.post('/login', async (req, res) => {
         if (token) {
             const isRegisteredUserResult = await isRegisteredUser(projectCollection, token);
             if (isRegisteredUserResult) {
-                res.status(200).json({ message: "User logged", "token": token });
+                res.status(200).json({ message: 'User logged', token: token });
             }
             else if (isRegisteredUserResult === false)
-                res.status(404).json({ message: "Wrong username or password" });
+                res.status(404).json({ message: 'Wrong username or password' });
             else
-                res.status(500).json({ message: "Server had a problem. Try later please." });
+                res
+                    .status(500)
+                    .json({ message: 'Server had a problem. Try later please.' });
         }
         else
-            res.status(500).json({ message: "Server had a problem. Try later please." });
+            res
+                .status(500)
+                .json({ message: 'Server had a problem. Try later please.' });
     }
     else {
-        res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values" });
+        res.status(400).json({
+            message: "Bad request. The parameters must be string and they mustn't be empty values",
+        });
     }
 });
 app.post('/registerUser', async (req, res) => {
+    console.log('entro');
     const { projectCollection, userName, password } = req.body;
     if (areValidValues(projectCollection, userName, password)) {
         const token = await encodeToken(userName, password);
@@ -142,18 +149,24 @@ app.post('/registerUser', async (req, res) => {
             const isRegisteredUserResult = await isRegisteredUser(projectCollection, token);
             if (isRegisteredUserResult === false) {
                 await addNewUser(projectCollection, token);
-                res.status(201).json({ message: "User successfully created" });
+                res.status(201).json({ message: 'User successfully created' });
             }
             else if (isRegisteredUserResult === true)
-                res.status(409).json({ message: "Username is already taken" });
+                res.status(409).json({ message: 'Username is already taken' });
             else
-                res.status(500).json({ message: "Server had a problem. Try later please." });
+                res
+                    .status(500)
+                    .json({ message: 'Server had a problem. Try later please.' });
         }
         else
-            res.status(500).json({ message: "Server had a problem. Try later please." });
+            res
+                .status(500)
+                .json({ message: 'Server had a problem. Try later please.' });
     }
     else {
-        res.status(400).json({ message: "Bad request. The parameters must be string and they mustn't be empty values" });
+        res.status(400).json({
+            message: "Bad request. The parameters must be string and they mustn't be empty values",
+        });
     }
 });
 app.post('/googleLogin', async (req, res) => {
@@ -163,39 +176,52 @@ app.post('/googleLogin', async (req, res) => {
         const isRegisteredUserResult = await isRegisteredUser(projectCollection, tokenFromGoogle);
         if (isRegisteredUserResult === false) {
             await addNewUser(projectCollection, tokenFromGoogle);
-            res.status(201).json({ message: "User successfully created", "token": tokenFromGoogle });
+            res.status(201).json({
+                message: 'User successfully created',
+                token: tokenFromGoogle,
+            });
         }
         else if (isRegisteredUserResult === true)
-            res.status(200).json({ message: "User logged", "token": tokenFromGoogle });
+            res
+                .status(200)
+                .json({ message: 'User logged', token: tokenFromGoogle });
         else
-            res.status(500).json({ message: "Server had a problem. Try later please." });
+            res
+                .status(500)
+                .json({ message: 'Server had a problem. Try later please.' });
     }
     else
-        res.status(500).json({ message: "Server had a problem. Try later please." });
+        res
+            .status(500)
+            .json({ message: 'Server had a problem. Try later please.' });
 });
 app.post('/getContentLikedData', async (req, res) => {
     const { token, projectCollection } = req.body;
     const docId = await getDocIdFromToken(projectCollection, token);
     if (docId) {
         const contentLikedData = await getContentLikedData(projectCollection, docId);
-        res.status(200).json({ "contentLiked": contentLikedData });
+        res.status(200).json({ contentLiked: contentLikedData });
     }
     else
-        res.status(500).json({ message: "Server had a problem. Try later please." });
+        res
+            .status(500)
+            .json({ message: 'Server had a problem. Try later please.' });
 });
 app.post('/setContentLikedData', async (req, res) => {
     const { token, projectCollection, updatedData } = req.body;
     const docId = await getDocIdFromToken(projectCollection, token);
     if (docId) {
         const contentLikedData = await setContentLikedData(projectCollection, docId, updatedData);
-        res.status(200).json({ "setcontentLiked": contentLikedData });
+        res.status(200).json({ setcontentLiked: contentLikedData });
     }
     else
-        res.status(500).json({ message: "Server had a problem. Try later please." });
+        res
+            .status(500)
+            .json({ message: 'Server had a problem. Try later please.' });
 });
 const options = {
     key: fs_1.default.readFileSync('/etc/cert/privkey.pem'),
-    cert: fs_1.default.readFileSync('/etc/cert/fullchain.pem')
+    cert: fs_1.default.readFileSync('/etc/cert/fullchain.pem'),
 };
 const server = https_1.default.createServer(options, app);
 const port = 3100;

@@ -184,12 +184,10 @@ app.post(
           .status(500)
           .json({ message: 'Server had a problem. Try later please.' });
     } else {
-      res
-        .status(400)
-        .json({
-          message:
-            "Bad request. The parameters must be string and they mustn't be empty values",
-        });
+      res.status(400).json({
+        message:
+          "Bad request. The parameters must be string and they mustn't be empty values",
+      });
     }
   }
 );
@@ -223,12 +221,10 @@ app.post(
           .status(500)
           .json({ message: 'Server had a problem. Try later please.' });
     } else {
-      res
-        .status(400)
-        .json({
-          message:
-            "Bad request. The parameters must be string and they mustn't be empty values",
-        });
+      res.status(400).json({
+        message:
+          "Bad request. The parameters must be string and they mustn't be empty values",
+      });
     }
   }
 );
@@ -247,12 +243,10 @@ app.post(
 
       if (isRegisteredUserResult === false) {
         await addNewUser(projectCollection, tokenFromGoogle);
-        res
-          .status(201)
-          .json({
-            message: 'User successfully created',
-            token: tokenFromGoogle,
-          });
+        res.status(201).json({
+          message: 'User successfully created',
+          token: tokenFromGoogle,
+        });
       } else if (isRegisteredUserResult === true)
         res
           .status(200)
