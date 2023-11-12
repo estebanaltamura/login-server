@@ -229,12 +229,8 @@ app.post('/setContentLikedData', async (req, res) => {
       .json({ message: 'Server had a problem. Try later please.' });
 });
 const options = {
-  key: fs_1.default.readFileSync(
-    '/etc/letsencrypt/live/encrypted-chat-backend.online/privkey.pem'
-  ),
-  cert: fs_1.default.readFileSync(
-    '/etc/letsencrypt/live/encrypted-chat-backend.online/fullchain.pem'
-  ),
+  key: fs_1.default.readFileSync('/etc/cert/privkey.pem'),
+  cert: fs_1.default.readFileSync('/etc/cert/fullchain.pem'),
 };
 const server = https_1.default.createServer(options, app);
 const port = 3100;
