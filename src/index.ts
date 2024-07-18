@@ -31,7 +31,7 @@ const encodeToken = async (
 ): Promise<string | null> => {
   try {
     const privateKey: string = await fs.promises.readFile(
-      '/home/ubuntu/projects/login-server/privateKey.txt',
+      '/home/ssm-user/projects/login-server/privateKey.txt',
       'utf8'
     );
     const token: string = jsonWebToken.sign(
