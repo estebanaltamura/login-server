@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 const firestore = new Firestore({
   projectId: 'login-7e24a',
   keyFilename:
-    '/home/ubuntu/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
+    '/home/ssm-user/projects/login-server/src/login-7e24a-firebase-adminsdk-tbg0z-3d702abca0.json',
 });
 
 const encodeToken = async (
