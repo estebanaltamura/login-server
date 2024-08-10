@@ -28,7 +28,7 @@ const firestore = new firestore_1.Firestore({
 });
 const encodeToken = (userName, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const privateKey = yield fs_1.default.promises.readFile('/home/ssm-user/projects/login-server/privateKey.txt', 'utf8');
+        const privateKey = yield fs_1.default.promises.readFile('/home/ubuntu/projects/login-server/privateKey.txt', 'utf8');
         const token = jsonwebtoken_1.default.sign({ userName, password }, privateKey, { noTimestamp: true });
         return token;
     }
